@@ -12,7 +12,7 @@ vivas = [0, 0]                   # casillas de barco que quedan sin tocar en cad
 impactos_fila = [0] * FILAS      # mis impactos por fila, para el informe final
 mis_resultados = []              # resultado de cada uno de mis disparos
 
-
+#--------------------------------------------------------------------------------------------------------------------------------
 
 # Creo los dos tableros y coloco los barcos al azar
 for jugador in range(2):
@@ -24,9 +24,9 @@ for jugador in range(2):
     rad = []
 
     for f in range(FILAS):
-        tab.append([AGUA] * COLUMNAS)      #crea una fila completa con COLUMNAS casillas inicializadas con AGUA.
+        tab.append([AGUA] * COLUMNAS)                                          #crea una fila completa con COLUMNAS casillas inicializadas con AGUA.
         rad.append([AGUA] * COLUMNAS)
-    tableros[jugador] = tab                #guarda los tableros creados dentro de las listas generales
+    tableros[jugador] = tab                                                    #guarda los tableros creados dentro de las listas generales
     radares[jugador] = rad
 
     for tamano in TAMANOS:
@@ -37,40 +37,45 @@ for jugador in range(2):
         puesto = False
 
         while not puesto:
-            fila = random.randint(0, FILAS - 1)                      #genera una fila aleatoria entre la primera fila (0) y la última fila válida
-            columna = random.randint(0, COLUMNAS - 1)                #genera una columna aleatoria entre la primera columna (0) y la última columna válida
-            horizontal = random.choice([True, False])                #si es True va en horizontal el barco, sino en vertical
+            fila = random.randint(0, FILAS - 1)                                 #genera una fila aleatoria entre la primera fila (0) y la última fila válida
+            columna = random.randint(0, COLUMNAS - 1)                           #genera una columna aleatoria entre la primera columna (0) y la última columna válida
+            horizontal = random.choice([True, False])                           #si es True va en horizontal el barco, sino en vertical
 
             # calculo las casillas que ocuparia el barco
             casillas = []
 
-            for paso in range(tamano):           #para recorrer c/casilla que ocupará el barco
+            for paso in range(tamano):                                          #para recorrer c/casilla que ocupará el barco
                 if horizontal:
                     casillas.append([fila, columna + paso])
                 else:
                     casillas.append([fila + paso, columna])
 
-            # miro si todas caben y estan libres
-            ok = True                                 #asumo inicialmente que el barco puede colocarse
-            for f, c in casillas:                     #para recorrer todas las posiciones calculadas para el barco.
-                if f >= FILAS or c >= COLUMNAS:       #comprobar si alguna posición queda fuera del tablero. Pej. f10 o c10
+            # ********Controlo que los barcos no se salgan del tablero. Reviso que ninguna coordenada esté fuera de los límites del tablero.**********
+            ok = True                                                           #asumo inicialmente que el barco puede colocarse
+            for f, c in casillas:                                               #para recorrer todas las posiciones calculadas para el barco.
+                if f >= FILAS or c >= COLUMNAS:                                 #comprobar si alguna posición queda fuera del tablero. Pej. f10 o c10
                     ok = False
-                elif tab[f][c] == BARCO:              #comprueba si en la posición ya existe otro barco.
-                    ok = False                        #para que los barcos se superpongan.
+                elif tab[f][c] == BARCO:                                        #****comprueba si en la posición ya existe otro barco para que no se pisen****
+                    ok = False                                                  #para que los barcos se superpongan.
 
             # si la posición generada para el barco es valida, se ejecuta esta parte!
-            if ok:                                    #comprobar que todas las casillas del barco están dentro del tablero y libres. Si ok es False, no se coloca el barco y se busca otra posición
-                for f, c in casillas:                 #recorre todas las posiciones que ocupará el barco.
+            if ok:                                                              #comprobar que todas las casillas del barco están dentro del tablero y libres. Si ok es False, no se coloca el barco y se busca otra posición
+                for f, c in casillas:                                           #recorre todas las posiciones que ocupará el barco.
                     tab[f][c] = BARCO
-                barcos[jugador].append(casillas)      #se guarda la lista de coordenadas del barco
-                vivas[jugador] += tamano              #cada vez que se alcance una casilla de barco, este contador disminuirá
-                puesto = True                         #indica que el barco ya se ha colocado correctamente y sirve para salir del bucle
+                barcos[jugador].append(casillas)                                #se guarda la lista de coordenadas del barco
+                vivas[jugador] += tamano                                        #cada vez que se alcance una casilla de barco, este contador disminuirá
+                puesto = True                                                   #indica que el barco ya se ha colocado correctamente y sirve para salir del bucle
+
+
+#--------------------------------------------------------------------------------------------------------------------------------
 
 # Mensajes de inicio
 '''Se muestran reglas, símbolos y el título del juego. turno=0 para mí y turno=1 para la maquina.'''
 
 print("=" * 48)
-print("       JUEGO HUNDIR LA FLOTA")
+print("╔══════════════════════════════════════╗")
+print("║         🚢 HUNDIR LA FLOTA 🚢        ║")
+print("╚══════════════════════════════════════╝")
 print("=" * 48)
 print("Juego contra la máquina en un mar de 10 x 10.")
 print("Escribo coordenadas tipo B7. Si escribo Q, salgo.")
@@ -79,6 +84,7 @@ print("B = mi barco, X = tocado, · = agua, ~ = sin disparar")
 turno = 0          # 0 = me toca a mi, 1 = le toca a la maquina
 abandonado = False
 
+#--------------------------------------------------------------------------------------------------------------------------------
 
 '''Bucle principal: while vivas[0] > 0 and vivas[1] > 0 mantiene la partida activa mientras ambos jugadores tengan barcos.'''  
 while vivas[0] > 0 and vivas[1] > 0:
@@ -92,10 +98,12 @@ while vivas[0] > 0 and vivas[1] > 0:
 
         # con esto recorro dos tableros y muestro el titulo correspondiente en mi radar y mi flota
         for titulo, tab in [("MI RADAR (lo que sé de la máquina)", radares[0]),
-                            ("MI FLOTA", tableros[0])]:
+                            ("MI FLOTA", tableros[0]),
+                            ("🚢 BARCOS DE LA MÁQUINA (****DEBUG****)", tableros[1])                      #para mostrar los barcos de la maquina
+                            ]:
             
             print("\n--- " + titulo + " ---")
-            print("  1 2 3 4 5 6 7 8 9 10")
+            print("   1  2  3  4  5  6  7  8  9 10")
 
             for i, fila_texto in enumerate(tab):
 
@@ -121,7 +129,7 @@ while vivas[0] > 0 and vivas[1] > 0:
             print("Esa casilla no existe en el tablero.")
             continue
 
-        if radares[0][fila][columna] != AGUA:
+        if radares[0][fila][columna] != AGUA:                                 #****Que no se repita un disparo del jugador****
             print("Ya disparé ahí. Pruebo otra vez.")
             continue
 
@@ -133,14 +141,14 @@ while vivas[0] > 0 and vivas[1] > 0:
         print("\nLa máquina está pensando...")
         libres = []
 
-        for f in range(FILAS):                        #Recorre todas las posiciones del radar del jugador 1 "maquina"
+        for f in range(FILAS):                                                  #****Recorre todas las posiciones del radar del jugador 1 "maquina" y controla que no repita disparos****
             for c in range(COLUMNAS):
-                if radares[1][f][c] == AGUA:          #Comprueba si esa casilla sigue teniendo el símbolo de agua
-                    libres.append((f, c))             #Guarda las coordenadas en la lista libres
-        fila, columna = random.choice(libres)         #selecciona una posición al azar de la lista
+                if radares[1][f][c] == AGUA:                                    #Comprueba si esa casilla sigue teniendo el símbolo de agua
+                    libres.append((f, c))                                       #Guarda las coordenadas en la lista libres
+        fila, columna = random.choice(libres)                                   #selecciona una posición al azar de la lista
 
         print("La máquina dispara a " + LETRAS[fila] + str(columna + 1) + ".")
-
+#--------------------------------------------------------------------------------------------------------------------------------
     # el disparo (igual para mi y para la maquina)
     '''Resolución del disparo: atacante indica quién dispara y defensor quién recibe. 
     Se revisan todos los barcos enemigos. Si la coordenada pertenece a un barco se elimina con remove(). 
@@ -151,14 +159,16 @@ while vivas[0] > 0 and vivas[1] > 0:
     resultado = "agua"
 
     for barco in barcos[defensor]:
-        if [fila, columna] in barco:                 #Comprueba si la posición disparada pertenece a ese barco
-            barco.remove([fila, columna])            #Elimina esa parte del barco. De esta forma el barco va perdiendo casillas conforme recibe disparos.
-            vivas[defensor] -= 1                     #Resta una casilla viva del defensor.
-            if len(barco) == 0:                      #En lugar de guardar un estado (tocado, hundido) para cada casilla, el programa va eliminando las coordenadas restantes de cada barco. Cuando la lista queda vacía (len(barco) == 0) hundido
+        if [fila, columna] in barco:                                           #Comprueba si la posición disparada pertenece a ese barco
+            barco.remove([fila, columna])                                      #Elimina esa parte del barco. De esta forma el barco va perdiendo casillas conforme recibe disparos.
+            vivas[defensor] -= 1                                               #Resta una casilla viva del defensor.
+            if len(barco) == 0:                                                #En lugar de guardar un estado (tocado, hundido) para cada casilla, el programa va eliminando las coordenadas restantes de cada barco. Cuando la lista queda vacía (len(barco) == 0) hundido
                 resultado = "hundido"
             else:
                 resultado = "tocado"
             break
+
+#--------------------------------------------------------------------------------------------------------------------------------
 
     # Marco el disparo en el radar del que dispara y en el tablero del otro
     '''Actualización de tableros: Los disparos fallidos se marcan con FALLO. 
@@ -171,6 +181,8 @@ while vivas[0] > 0 and vivas[1] > 0:
         radares[atacante][fila][columna] = IMPACTO
         tableros[defensor][fila][columna] = IMPACTO
 
+#--------------------------------------------------------------------------------------------------------------------------------
+
     # Guardo los datos para el informe (solo de mis disparos)
     '''Estadísticas: Solo los disparos se almacenan en mis_resultados. 
     impactos_fila registra en qué filas se consiguieron impactos.'''
@@ -179,6 +191,8 @@ while vivas[0] > 0 and vivas[1] > 0:
         mis_resultados.append(resultado)
         if resultado != "agua":
             impactos_fila[fila] += 1
+
+#--------------------------------------------------------------------------------------------------------------------------------
 
     # Mensajes y cambio de turno
     '''Si el resultado es agua cambia el turno mediante turno = 1 - turno. 
@@ -206,6 +220,7 @@ while vivas[0] > 0 and vivas[1] > 0:
         else:
             print("La máquina repite turno.")
 
+#--------------------------------------------------------------------------------------------------------------------------------
 
 # Final de la partida!!!!!!
 '''Si abandonado es True se termina la misión. En caso contrario se comprueba quién se quedó sin barcos. 
@@ -228,13 +243,18 @@ else:
     for i, fila_texto in enumerate(tableros[1]):
         print(LETRAS[i], " ".join(fila_texto))
 
+        
+#--------------------------------------------------------------------------------------------------------------------------------
+
     # Imprimo el informe final de la partida
     '''Se calculan disparos, impactos, agua, barcos hundidos y precisión. 
     precision = impactos / total * 100 calcula el porcentaje de aciertos. 
     round(precision,1) redondea a un decimal. Finalmente se muestran los impactos por fila usando caracteres #.'''
 
     print("\n" + "=" * 48)
-    print("INFORME DE LA PARTIDA")
+    print("╔══════════════════════════════════════╗")
+    print("║       📋 INFORME DE LA PARTIDA 📋    ║")
+    print("╠══════════════════════════════════════╣")
     print("=" * 48)
 
     total = len(mis_resultados)
@@ -250,14 +270,14 @@ else:
         if r == "hundido":
             hundidos += 1
 
-    print("Disparos: " + str(total))
-    print("Impactos: " + str(impactos))
-    print("Agua: " + str(agua))
-    print("Barcos hundidos: " + str(hundidos))
+    print("📡 Disparos: " + str(total))
+    print("🎯 Impactos: " + str(impactos))
+    print("🌊 Agua: " + str(agua))
+    print("💥 Barcos hundidos: " + str(hundidos))
 
     if total > 0:
         precision = impactos / total * 100
-        print('Precisión: ' + str(round(precision, 1)) + "%")
+        print('📈 Precisión: ' + str(round(precision, 1)) + "%")
 
     print("\nImpactos por fila:")
 
